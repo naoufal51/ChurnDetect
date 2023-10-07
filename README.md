@@ -11,9 +11,11 @@ Here's a quick overview of the main components in the root directory:
 - `churn_notebook.ipynb`: Jupyter notebook containing exploratory data analysis and initial model prototyping.
 - `run_train.py`: Python script responsible for training the machine learning models and saving the trained models.
 - `churn_library.py`: A library of functions and utilities used throughout the project.
+- `churn_script_logging_and_tests.py`: Tests for our library functions.
 - `data/`: Folder containing raw data files.
   - `bank_data.csv`: Main dataset with customer attributes and their churn status.
 - `images/`: Folder with visualizations and plots generated during the EDA.
+- `models/`: Folder with saved models.
 - `requirements.txt`: A list of Python dependencies required for this project.
 
 ## Running Files
