@@ -1,19 +1,13 @@
 import os
-import logging
 import pandas as pd
+import logging
+
 from churn_library import (
     import_data,
     perform_eda,
     encoder_helper,
     perform_feature_engineering,
     train_models,
-)
-
-logging.basicConfig(
-    filename="./logs/churn_library.log",
-    level=logging.INFO,
-    filemode="w",
-    format="%(name)s - %(levelname)s - %(message)s",
 )
 
 
@@ -45,6 +39,11 @@ def test_eda(perform_eda):
     df = import_data("./data/bank_data.csv")
     perform_eda(df)
     assert os.path.exists("images/churn_distribution.png")
+    assert os.path.exists("images/customer_age_distribution.png")
+    assert os.path.exists("images/marital_status_distribution.png")
+    assert os.path.exists("images/total_transaction_distribution.png")
+    assert os.path.exists("images/correlation_matrix.png")
+    assert os.path.exists("images/churn_by_gender.png")
     logging.info("Testing perform_eda: Plot generation SUCCESS")
 
 
@@ -86,7 +85,8 @@ def test_perform_feature_engineering(perform_feature_engineering):
     assert isinstance(y_train, pd.Series)
     assert isinstance(y_test, pd.Series)
 
-    logging.info("Testing perform_feature_engineering: Feature Engineering SUCCESS")
+    logging.info(
+        "Testing perform_feature_engineering: Feature Engineering SUCCESS")
 
 
 def test_train_models(train_models):
@@ -104,6 +104,14 @@ def test_train_models(train_models):
     assert os.path.exists("./models/logistic_model.pkl")
 
     assert os.path.exists("images/roc_curve.png")
+
+    assert os.path.exists("images/random_forest_importance.png")
+
+    assert os.path.exists("images/logistic_regression_shap_lr.png")
+    assert os.path.exists("images/random_forest_shap_rf.png")
+
+    assert os.path.exists("images/random_forest_report.png")
+    assert os.path.exists("images/logistic_regression_report.png")
 
     logging.info("Testing train_models: Model training and saving SUCCESS")
 

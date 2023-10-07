@@ -1,7 +1,22 @@
-# library doc string
+"""
+Churn Library
+=============
+Churn Library containing functions used for training and testing the model for churn analysis and prediction using machine learning.
+The functions range from importing data, performing EDA, feature engineering, training the model, and saving the model.
 
+Main Feature
+------------
+    - import_data: imports data from csv file
+    - perform_eda: performs EDA on the data
+    - encoder_helper: encodes categorical features
+    - perform_feature_engineering: performs feature engineering on the data
+    - train_models: trains the models
 
-# import libraries
+Note
+----
+To run this code you need to install the necessary dependencies and create the necessary file structure.
+"""
+
 import os
 import numpy as np
 import pandas as pd
@@ -33,12 +48,14 @@ def import_data(pth):
             pth: a path to the csv
     output:
             df: pandas dataframe
+    raises:
+            FileNotFoundError: if the specified file is not found
     """
     try:
         df = pd.read_csv(pth)
         logging.info(f"Success in importing data from {pth}")
-    except Exception as e:
-        logging.error(f"Error in importing data from {pth}")
+    except FileNotFoundError as err:
+        logging.error(f"Testing import_data: {pth} does not exist")
         raise
     return df
 
@@ -53,27 +70,59 @@ def perform_eda(df):
             None
     """
 
-    def save_plot(plot_fn, filename, **kwargs):
-        if not os.path.exists("images"):
-            os.makedirs("images")
-        plt.figure(figsize=(20, 10))
+    def save_plot(plot_fn, filename, directory="images", **kwargs):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        plt.figure(figsize=(10, 5))
+
+        plot_dict = plot_titles[filename]
+        if "title" in plot_dict:
+            plt.title(plot_dict["title"])
+        if "xlabel" in plot_dict:
+            plt.xlabel(plot_dict["xlabel"])
+        if "ylabel" in plot_dict:
+            plt.ylabel(plot_dict["ylabel"])
+
         plot_fn(**kwargs)
-        plt.savefig(f"images/{filename}.png")
+        plt.savefig(f"{directory}/{filename}.png")
         plt.close()
-        logging.info(f"Saved {filename} plot to images folder")
+        logging.info(f"Saved {filename} plot to {directory} folder")
+
+    plot_titles = {
+        "churn_distribution": {
+            "title": "Churn Distribution",
+            "xlabel": "Churn",
+            "ylabel": "Frequency",
+        },
+        "customer_age_distribution": {
+            "title": "Customer Age Distribution",
+            "xlabel": "Customer Age",
+            "ylabel": "Frequency",
+        },
+        "marital_status_distribution": {
+            "title": "Marital Status Distribution",
+            "xlabel": "Marital Status",
+            "ylabel": "Proportion",
+        },
+        "total_transaction_distribution": {
+            "title": "Total Transaction Distribution",
+            "xlabel": "Transaction Count",
+            "ylabel": "Density",
+        },
+        "correlation_matrix": {"title": "Correlation Matrix"},
+        "churn_by_gender": {
+            "title": "Churn by Gender",
+            "xlabel": "Gender",
+            "ylabel": "Count",
+        },
+    }
 
     df["Churn"] = df["Attrition_Flag"].apply(
         lambda val: 0 if val == "Existing Customer" else 1
     )
 
-    save_plot(
-        df["Churn"].hist,
-        "churn_distribution",
-    )
-    save_plot(
-        df["Customer_Age"].hist,
-        "customer_age_distribution",
-    )
+    save_plot(df["Churn"].hist, "churn_distribution")
+    save_plot(df["Customer_Age"].hist, "customer_age_distribution")
     save_plot(
         df.Marital_Status.value_counts(normalize=True).plot,
         "marital_status_distribution",
@@ -86,6 +135,7 @@ def perform_eda(df):
         stat="density",
         kde=True,
     )
+
     numeric_df = df.select_dtypes(include=[np.number])
     correlation_matrix = numeric_df.corr()
     save_plot(
@@ -96,6 +146,8 @@ def perform_eda(df):
         cmap="Dark2_r",
         linewidths=2,
     )
+
+    save_plot(sns.countplot, "churn_by_gender", x="Gender", data=df, hue="Churn")
 
 
 def encoder_helper(df, category_lst, response):
